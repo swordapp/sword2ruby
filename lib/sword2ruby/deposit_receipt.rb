@@ -31,10 +31,21 @@ module Sword2Ruby
       @status_message = response.message
             
       if response.body
+                      
         #If a receipt was returned, parse it
-        @entry = ::Atom::Entry.parse(response.body)
-        @entry.http = connection
-        @has_entry = true
+        begin
+          #ensure that there are not parse errors. If there are, warn, rather then raise
+          @entry = ::Atom::Entry.parse(response.body)          
+          @has_entry = true
+          @entry.http = connection
+        rescue Exception => message
+          @has_entry = false
+          $stderr.puts "ERROR: An error occured processing the Response XML: #{message}"
+        rescue StandardError => error
+          @has_entry = false
+          $stderr.puts "WARN: The deposit was successful, but there was an issue with Response XML. It could be missing. (#{error})"
+        end
+        
       else
         #if the receipt was not returned, try and retrieve it
         if @location
