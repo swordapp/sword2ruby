@@ -45,9 +45,11 @@ module Sword2Ruby
       rxml = nil
 
       res = connection.get(base, "Accept" => "application/atomsvc+xml")
-      res.validate_content_type(["application/atomsvc+xml"])
+     
       
       if res.is_a? Net::HTTPSuccess
+        res.validate_content_type(["application/atomsvc+xml"])
+        
         service = self.class.parse(res.body, base, self)
 
         #Update workspaces, collections and their feeds to use the Service's http connection
